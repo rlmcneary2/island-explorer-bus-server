@@ -1,4 +1,13 @@
 [Settings]
 
+[build]
+  base = "apps/functions"
+
 [functions]
-  directory = "apps/functions/src"
+  directory = "src"
+
+[[redirects]]
+  from = "/api/InfoPoint/rest/Vehicles/GetAllVehiclesForRoutes"
+  to = ".netlify/functions/GetAllVehiclesForRoutes/:splat"
+  status = 200
+  force = true

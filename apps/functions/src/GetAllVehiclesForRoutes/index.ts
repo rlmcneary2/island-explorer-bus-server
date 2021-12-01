@@ -10,7 +10,7 @@ export async function handler(
 ): Promise<HandlerResponse> {
   const response: HandlerResponse = {
     statusCode: 200,
-    body: "function handled"
+    body: JSON.stringify(event)
   };
 
   return response;
