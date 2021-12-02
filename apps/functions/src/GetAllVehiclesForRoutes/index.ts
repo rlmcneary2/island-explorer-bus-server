@@ -1,3 +1,5 @@
+import { promises as fs } from "fs";
+import { LocalStorage } from "node-localstorage";
 import {
   HandlerContext,
   HandlerEvent,
@@ -8,9 +10,55 @@ export async function handler(
   event: HandlerEvent,
   context: HandlerContext
 ): Promise<HandlerResponse> {
+  const { routeIDs } = event.queryStringParameters;
+  if (!routeIDs) {
+    return {
+      body: "No routeIDs param.",
+      statusCode: 400
+    };
+  }
+
+  let id: number;
+  try {
+    id = +routeIDs;
+  } catch {
+    return {
+      body: `Failed to parse routeIDs='${routeIDs}' to a number.`,
+      statusCode: 400
+    };
+  }
+
+  const localStorage = new LocalStorage("./scratch");
+  const lastFilename = localStorage.getItem("last-file-name") as string;
+
+  const dataPathname =
+    process.cwd() + "/apps/functions/src/GetAllVehiclesForRoutes/data";
+
+  const filenames = (await fs.readdir(dataPathname)).sort();
+
+  let filename = filenames[0];
+  if (lastFilename) {
+    for (let i = 0; i < filenames.length; i++) {
+      if (filenames[i] === lastFilename) {
+        if (i + 1 < filenames.length) {
+          filename = filenames[i + 1];
+        } else {
+          filename = filenames[0];
+        }
+      }
+    }
+  }
+
+  localStorage.setItem("last-file-name", filename);
+
+  const file = JSON.parse(
+    (await fs.readFile(`${dataPathname}/${filename}`)).toString()
+  );
+
   const response: HandlerResponse = {
-    statusCode: 200,
-    body: JSON.stringify(event)
+    body: JSON.stringify(file.filter(x => x.RouteId === id)),
+    headers: { "Content-Type": "application/json" },
+    statusCode: 200
   };
 
   return response;
