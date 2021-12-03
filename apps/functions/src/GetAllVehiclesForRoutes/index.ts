@@ -1,5 +1,4 @@
 import { promises as fs } from "fs";
-import { LocalStorage } from "node-localstorage";
 import {
   HandlerContext,
   HandlerEvent,
@@ -28,14 +27,12 @@ export async function handler(
     };
   }
 
-  const localStorage = new LocalStorage("./scratch");
-  const lastFilename = localStorage.getItem("last-file-name") as string;
-
   const dataPathname =
     process.cwd() + "/apps/functions/src/GetAllVehiclesForRoutes/data";
 
   const filenames = (await fs.readdir(dataPathname)).sort();
 
+  const [, lastFilename] = event.headers["cookie"].split("=");
   let filename = filenames[0];
   if (lastFilename) {
     for (let i = 0; i < filenames.length; i++) {
@@ -49,15 +46,16 @@ export async function handler(
     }
   }
 
-  localStorage.setItem("last-file-name", filename);
-
   const file = JSON.parse(
     (await fs.readFile(`${dataPathname}/${filename}`)).toString()
   );
 
   const response: HandlerResponse = {
     body: JSON.stringify(file.filter(x => x.RouteId === id)),
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Set-Cookie": `file-name=${filename}; HttpOnly`
+    },
     statusCode: 200
   };
 

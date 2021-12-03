@@ -2,7 +2,6 @@
 
 [build]
   base = "apps/functions"
-  command = "yarn install"
 
 [functions]
   directory = "src"
