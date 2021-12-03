@@ -32,7 +32,10 @@ export async function handler(
 
   const filenames = (await fs.readdir(dataPathname)).sort();
 
-  const [, lastFilename] = event.headers["cookie"].split("=");
+  const lastFilename = event.headers["cookie"]
+    ? event.headers["cookie"].split("=")[1]
+    : null;
+
   let filename = filenames[0];
   if (lastFilename) {
     for (let i = 0; i < filenames.length; i++) {
