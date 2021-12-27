@@ -57,7 +57,7 @@ export async function handler(
     body: JSON.stringify(file.filter(x => x.RouteId === id)),
     headers: {
       "Content-Type": "application/json",
-      "Set-Cookie": `file-name=${filename}; SameSite=None`
+      "Set-Cookie": `file-name=${filename}; SameSite=None; Secure`
     },
     statusCode: 200
   };
