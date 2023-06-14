@@ -56,6 +56,9 @@ export async function handler(
   const response: HandlerResponse = {
     body: JSON.stringify(file.filter(x => x.RouteId === id)),
     headers: {
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Methods": "GET",
+      "Access-Control-Allow-Headers": "Content-Type, Access-Control-Allow-Headers, X-Requested-With",
       "Content-Type": "application/json",
       "Set-Cookie": `file-name=${filename}; SameSite=None; Secure`
     },
